@@ -55,6 +55,8 @@ def __container_push_impl(ctx):
         container_tag_file = ctx.file.container_tag_file.short_path
         pusher_input.append(ctx.file.container_tag_file)
 
+    empty_file = ctx.actions.declare_file("%s_empty.txt" % ctx.attr.name)
+    ctx.actions.write(empty_file, "")
     pusher_config = struct(
         manifest_path = assembled.manifest.short_path,
         config_path = assembled.config.short_path,
@@ -64,7 +66,7 @@ def __container_push_impl(ctx):
         container_tags = container_tags,
         registry_type = ctx.attr.registry_format,
         container_tag_file = container_tag_file,
-        stamp_info_file = ctx.info_file.short_path,
+        stamp_info_file = ctx.info_file.short_path if ctx.attr.stamp_to_env else empty_file.short_path,
         stamp_to_env = ctx.attr.stamp_to_env
     )
 
